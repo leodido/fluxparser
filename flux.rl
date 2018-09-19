@@ -2,6 +2,7 @@ package fluxparser
 
 import (
 	"fmt"
+	"github.com/influxdata/flux/ast"
 )
 
 %%{
@@ -13,6 +14,7 @@ action mark {
 	fmt.Println("mark", m.p, m.pb, m.stack)
 	m.pb = m.p
 }
+
 
 newline = '\n' @{
     m.curline++;
@@ -151,6 +153,9 @@ func (m *machine) Parse(input []byte) bool {
 
     %% write init;
     %% write exec;
+	prog:=ast.Program{
+		BaseNode: &BaseNode{}
+	}
 
 	if m.cs < first_final  {
 		return false
