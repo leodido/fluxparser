@@ -2,7 +2,6 @@ package fluxparser
 
 import (
 	"github.com/influxdata/flux/ast"
-	"bytes"
 )
 
 %%{
