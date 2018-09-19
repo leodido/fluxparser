@@ -30,16 +30,20 @@ alnum_ = alnum | '_';
 # Alpha characters or underscore.
 alpha_ = alpha | '_';
 
-# String literal.
-stringliteral = [^"\\] | !newline | ('\\"');
-
 action ex_doublestringchar {
 	m.expression = &ast.StringLiteral{
 		Value: string(m.text()),
 	}
 }
 
-doublestringchar = '"' . stringliteral* >mark %ex_doublestringchar . '"';
+fieldstringchar =
+	[^\n\f\r\\"] | '\\' [\\"];
+
+fieldstring =
+	fieldstringchar* >mark %ex_doublestringchar;
+
+doublestringchar =
+	'"' fieldstring '"';
 
 # Identifier.
 identifier = alpha_ . alnum_*;
@@ -137,7 +141,7 @@ blkclose = __ . '}';
 # Block declaration.
 blkdecl = blkopen @{ fcall closingbrace; }; # fixme> in OR with? => [^{}] |
 
-closingbrace := (vardecl | optdecl | retdecl | blkdecl)* . blkclose @{ fret; };
+closingbrace := (vardecl | optdecl | retdecl | blkdecl |expr)* . blkclose @{ fret; };
 
 # action ex_statement {
 # 	fmt.Println("ex_statement")
