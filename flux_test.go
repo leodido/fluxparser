@@ -15,20 +15,6 @@ func TestParse(t *testing.T) {
 		want    *ast.Program
 		wantErr bool
 	}{
-		// 		{
-		// 			name: "from with join with complex expression",
-		// 			raw: `
-		// a = from(db:"Flux")
-		// 	|> filter(fn: (r) => r["_measurement"] == "a")
-		// 	|> range(start:-1h)
-
-		// b = from(db:"Flux")
-		// 	|> filter(fn: (r) => r["_measurement"] == "b")
-		// 	|> range(start:-1h)
-
-		// join(tables:[a,b], on:["t1"], fn: (a,b) => (a["_field"] - b["_field"]) / b["_field"])
-		// `,
-		// 		},
 		// {
 		// 	name: "empty block statement",
 		// 	raw:  `{}`,
@@ -41,20 +27,20 @@ func TestParse(t *testing.T) {
 		// 	name: "nest block statements",
 		// 	raw:  `{{}}`,
 		// },
-		// {
-		// 	name: "use variable to declare something",
-		// 	raw:  `howdy = "1"`,
-		// 	want: &ast.Program{
-		// 		Body: []ast.Statement{
-		// 			&ast.VariableDeclaration{
-		// 				Declarations: []*ast.VariableDeclarator{{
-		// 					ID:   &ast.Identifier{Name: "howdy"},
-		// 					Init: &ast.StringLiteral{Value: "1"},
-		// 				}},
-		// 			},
-		// 		},
-		// 	},
-		// },
+		{
+			name: "use variable to declare something",
+			raw:  `howdy = "literal"`,
+			want: &ast.Program{
+				Body: []ast.Statement{
+					&ast.VariableDeclaration{
+						Declarations: []*ast.VariableDeclarator{{
+							ID:   &ast.Identifier{Name: "howdy"},
+							Init: &ast.StringLiteral{Value: "literal"},
+						}},
+					},
+				},
+			},
+		},
 
 		// {
 		// 	name: "variable declaration",
@@ -65,7 +51,7 @@ func TestParse(t *testing.T) {
 		// 	raw:  `{docmerlin =}`,
 		// },
 		{
-			name: "use variable to declare something",
+			name: "from function",
 			raw:  `from()`,
 			want: &ast.Program{
 				Body: []ast.Statement{
@@ -81,17 +67,14 @@ func TestParse(t *testing.T) {
 		},
 	}
 
-	mach := NewMachine()
-
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			// t.Parallel()
-
+			mach := NewMachine()
 			if !tt.wantErr {
 				got := mach.Parse([]byte(tt.raw))
 				if !cmp.Equal(tt.want, got, asttest.CompareOptions...) {
-					t.Errorf("parser.NewAST() = -want/+got %s", cmp.Diff(tt.want, got, asttest.CompareOptions...))
+					t.Errorf("-want/+got %s", cmp.Diff(tt.want, got, asttest.CompareOptions...))
 				}
 			}
 
@@ -101,24 +84,20 @@ func TestParse(t *testing.T) {
 
 func BenchmarkParse(b *testing.B) {
 	tests := []struct {
-		name    string
-		raw     string
-		want    *ast.Program
-		wantErr bool
+		name string
+		raw  []byte
 	}{
 		{
 			name: "use variable to declare something",
-			raw:  `howdy = "1"`,
-			want: &ast.Program{
-				Body: []ast.Statement{
-					&ast.VariableDeclaration{
-						Declarations: []*ast.VariableDeclarator{{
-							ID:   &ast.Identifier{Name: "howdy"},
-							Init: &ast.StringLiteral{Value: "1"},
-						}},
-					},
-				},
-			},
+			raw:  []byte(`howdy = "literal"`),
+		},
+		{
+			name: "use variable to declare something without spaces",
+			raw:  []byte(`howdy="1"`),
+		},
+		{
+			name: "from function",
+			raw:  []byte(`from()`),
 		},
 	}
 
@@ -126,7 +105,7 @@ func BenchmarkParse(b *testing.B) {
 		mach := NewMachine()
 		b.Run(tt.name, func(b *testing.B) {
 			for n := 0; n < b.N; n++ {
-				mach.Parse([]byte(tt.raw))
+				mach.Parse(tt.raw)
 			}
 		})
 	}

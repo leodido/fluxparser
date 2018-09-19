@@ -3,30 +3,25 @@ package fluxparser
 import (
 	"testing"
 
-	"github.com/influxdata/flux/ast"
 	"github.com/influxdata/flux/parser"
 )
 
 func BenchmarkPigeonParse(b *testing.B) {
 	tests := []struct {
-		name    string
-		raw     string
-		want    *ast.Program
-		wantErr bool
+		name string
+		raw  string
 	}{
 		{
 			name: "use variable to declare something",
 			raw:  `howdy = "1"`,
-			want: &ast.Program{
-				Body: []ast.Statement{
-					&ast.VariableDeclaration{
-						Declarations: []*ast.VariableDeclarator{{
-							ID:   &ast.Identifier{Name: "howdy"},
-							Init: &ast.StringLiteral{Value: "1"},
-						}},
-					},
-				},
-			},
+		},
+		{
+			name: "use variable to declare something without spaces",
+			raw:  `howdy="1"`,
+		},
+		{
+			name: "from function",
+			raw:  `from()`,
 		},
 	}
 

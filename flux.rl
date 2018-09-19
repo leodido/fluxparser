@@ -2,6 +2,7 @@ package fluxparser
 
 import (
 	"github.com/influxdata/flux/ast"
+	"bytes"
 )
 
 %%{
@@ -45,8 +46,15 @@ fieldstring =
 doublestringchar =
 	'"' fieldstring '"';
 
+action ex_identifier {
+	m.identifier = &ast.Identifier{
+		Name: string(m.text()),
+		// BaseNode: base(m.text(), m.curline, m.col()),
+	}
+}
+
 # Identifier.
-identifier = alpha_ . alnum_*;
+identifier = alpha_ >mark . alnum_* %ex_identifier;
 
 # Equality operators.
 equalityop = ('==' | '!=' | '=~' | '!~');
@@ -90,26 +98,22 @@ primary = literal; # (todo) > complete ... pipexpr | array | literal | ...
 
 #todo(docmerlin) add ability to parse arguments
 action ex_callexpression { 
-	m.statements = append(m.statements, &ast.CallExpression{
-		Callee:    &ast.Identifier{Name: string(bytes.TrimRight(m.text(), "()"))},
-		Arguments: nil,
+	m.statements = append(m.statements, &ast.ExpressionStatement{
+		Expression: &ast.CallExpression{
+			Callee:    m.identifier,
+			Arguments: nil,
+			// BaseNode: base(m.text(), m.curline, m.col()),
+		},
 		// BaseNode: base(m.text(), m.curline, m.col()),
 	})
 	m.identifier = nil
-	m.expression = nil
 }
 
-callexpression = identifier . '()' %ex_callexpression; #todo(docmerlin) add ability to parse arguments
+callexpression = identifier >mark . '()' %ex_callexpression; #todo(docmerlin) add ability to parse arguments
 
-expr = literal|callexpression;
+expr = literal | callexpression;
+
 expdecl = expr;
-
-action ex_identifier {
-	m.identifier = &ast.Identifier{
-		Name: string(m.text()),
-		// BaseNode: base(m.text(), m.curline, m.col()),
-	}
-}
 
 action ex_vardecl{
 	m.statements = append(m.statements, &ast.VariableDeclaration{
@@ -126,7 +130,7 @@ action ex_vardecl{
 }
 
 # Variable declaration. # (todo) > complete
-vardecl = (identifier >mark %ex_identifier . __ . '=' . __ . expr) %ex_vardecl;
+vardecl = (identifier . __ . '=' . __ . expr) %ex_vardecl;
 
 # Option statement. # (todo) > complete
 optdecl = 'option' __ vardecl;
@@ -149,7 +153,7 @@ closingbrace := (vardecl | optdecl | retdecl | blkdecl |expr)* . blkclose @{ fre
 # }
 
 # Statement.
-statement = (vardecl | optdecl | retdecl | blkdecl|expr);
+statement = (vardecl | optdecl | retdecl | blkdecl | expdecl);
 
 action ex_program {
 	//fmt.Println("ex_program")
@@ -240,6 +244,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 	m.pe = len(input)
 	m.eof = len(input)
 	m.err = nil
+	m.root = nil
 
     %% write init;
     %% write exec;
