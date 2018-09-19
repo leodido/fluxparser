@@ -41,7 +41,7 @@ doublestringchar = '"' . stringliteral* . '"';
 identifier = alpha_ . alnum_*;
 
 # Variable declaration. # (todo) > complete
-vardecl = identifier . __ . '=' . __;
+vardecl = identifier . __ . '=' . __ %ex_vardecl;
 
 # Option statement. # (todo) > complete
 optdecl = 'option' __ vardecl;
@@ -58,13 +58,17 @@ blkdecl = blkopen @{ fcall closingbrace; }; # fixme> in OR with? => [^{}] |
 
 closingbrace := (vardecl | optdecl | retdecl | blkdecl)* blkclose @{ fret; };
 
-action ex_statement {
-	fmt.Println("ex_statement")
-	m.statements = append(m.statements, (ast.Statement)(nil))
+# action ex_statement {
+# 	fmt.Println("ex_statement")
+#	m.statements = append(m.statements, (ast.Statement)(nil))
+# }
+
+action ex_vardecl{
+	m.statements = append(m.statement, ast.VariableDeclaration{}
 }
 
 # Statement. # (todo) > complete
-statement = (vardecl | optdecl | retdecl | blkdecl) %ex_statement;
+statement = (vardecl | optdecl | retdecl | blkdecl); #%ex_statement;
 
 # # Equality operators.
 # equalityop = ('==' | '!=' | '=~' | '!~');
