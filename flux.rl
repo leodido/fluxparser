@@ -1,8 +1,6 @@
 package fluxparser
 
 import (
-	"fmt"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/influxdata/flux/ast"
 )
 
@@ -12,12 +10,12 @@ machine flux;
 alphtype uint8;
 
 action mark {
-	fmt.Println("mark", m.pb, m.p, m.stack)
+	//fmt.Println("mark", m.pb, m.p, m.stack)
 	m.pb = m.p
 }
 
 newline = '\n' @{
-	fmt.Println("INSIDEN")
+	//fmt.Println("INSIDEN")
 	m.sol = m.p
     m.curline++;
 };
@@ -150,7 +148,7 @@ closingbrace := (vardecl | optdecl | retdecl | blkdecl)* . blkclose @{ fret; };
 statement = (vardecl | optdecl | retdecl | blkdecl|expr);
 
 action ex_program {
-	fmt.Println("ex_program")
+	//fmt.Println("ex_program")
 
 	m.root = &ast.Program{
 		Body:     m.statements,
@@ -159,8 +157,8 @@ action ex_program {
 
 	// m.children = nil
 
-	fmt.Println(m.p)
-	spew.Dump(m.root)
+	//fmt.Println(m.p)
+	//spew.Dump(m.root)
 }
 
 # action endprogram {

@@ -1,23 +1,21 @@
 
-//line /tmp/flux.rl:1
+//line flux.rl:1
 package fluxparser
 
 import (
-	"fmt"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/influxdata/flux/ast"
 )
 
 
-//line /tmp/flux.rl:163
+//line flux.rl:161
 
 
 
-//line /tmp/flux.rl:173
+//line flux.rl:171
 
 
 
-//line /tmp/flux.go:21
+//line flux.go:19
 var _actions []byte = []byte{
 	0, 1, 0, 1, 1, 1, 2, 1, 3, 
 	1, 4, 1, 5, 1, 6, 1, 7, 
@@ -1098,7 +1096,7 @@ const en_closingbrace int = 126
 const en_main int = 1
 
 
-//line /tmp/flux.rl:176
+//line flux.rl:174
 
 type machine struct {
 	data         []byte
@@ -1120,19 +1118,19 @@ func NewMachine() *machine {
 	m := &machine{}
 
 	
-//line /tmp/flux.rl:197
+//line flux.rl:195
 	
-//line /tmp/flux.rl:198
+//line flux.rl:196
 	
-//line /tmp/flux.rl:199
+//line flux.rl:197
 	
-//line /tmp/flux.rl:200
+//line flux.rl:198
 	
-//line /tmp/flux.rl:201
+//line flux.rl:199
     
-//line /tmp/flux.rl:202
+//line flux.rl:200
     
-//line /tmp/flux.rl:203
+//line flux.rl:201
 
 	return m
 }
@@ -1158,15 +1156,15 @@ func (m *machine) Parse(input []byte) *ast.Program {
 	m.err = nil
 
     
-//line /tmp/flux.go:1162
+//line flux.go:1160
 	{
 	 m.cs = start
 	( m.top) = 0
 	}
 
-//line /tmp/flux.rl:228
+//line flux.rl:226
     
-//line /tmp/flux.go:1170
+//line flux.go:1168
 	{
 	var _klen int
 	var _trans int
@@ -1245,27 +1243,27 @@ _match:
 		_acts++
 		switch _actions[_acts-1] {
 		case 0:
-//line /tmp/flux.rl:14
+//line flux.rl:12
 
-	fmt.Println("mark", m.pb, m.p, m.stack)
+	//fmt.Println("mark", m.pb, m.p, m.stack)
 	m.pb = m.p
 
 		case 1:
-//line /tmp/flux.rl:19
+//line flux.rl:17
 
-	fmt.Println("INSIDEN")
+	//fmt.Println("INSIDEN")
 	m.sol = m.p
     m.curline++;
 
 		case 2:
-//line /tmp/flux.rl:38
+//line flux.rl:36
 
 	m.expression = &ast.StringLiteral{
 		Value: string(m.text()),
 	}
 
 		case 3:
-//line /tmp/flux.rl:90
+//line flux.rl:88
 
 	m.identifier = &ast.Identifier{
 		Name: string(m.text()),
@@ -1273,7 +1271,7 @@ _match:
 	}
 
 		case 4:
-//line /tmp/flux.rl:97
+//line flux.rl:95
 
 	m.statements = append(m.statements, &ast.VariableDeclaration{
 		Declarations: []*ast.VariableDeclarator{
@@ -1288,20 +1286,20 @@ _match:
 	m.expression = nil
 
 		case 5:
-//line /tmp/flux.rl:125
+//line flux.rl:123
  { 
 	m.stack = append(m.stack, 0)
 ( m.stack)[( m.top)] =  m.cs; ( m.top)++;  m.cs = 126; goto _again
  } 
 		case 6:
-//line /tmp/flux.rl:127
+//line flux.rl:125
  ( m.top)--;  m.cs = ( m.stack)[( m.top)]
 { 
 	m.stack = m.stack[:len(m.stack) - 1]
  }
 goto _again
  
-//line /tmp/flux.go:1305
+//line flux.go:1303
 		}
 	}
 
@@ -1321,7 +1319,7 @@ _again:
 			__acts++
 			switch _actions[__acts-1] {
 			case 4:
-//line /tmp/flux.rl:97
+//line flux.rl:95
 
 	m.statements = append(m.statements, &ast.VariableDeclaration{
 		Declarations: []*ast.VariableDeclarator{
@@ -1336,9 +1334,9 @@ _again:
 	m.expression = nil
 
 			case 7:
-//line /tmp/flux.rl:137
+//line flux.rl:135
 
-	fmt.Println("ex_program")
+	//fmt.Println("ex_program")
 
 	m.root = &ast.Program{
 		Body:     m.statements,
@@ -1347,10 +1345,10 @@ _again:
 
 	// m.children = nil
 
-	fmt.Println(m.p)
-	spew.Dump(m.root)
+	//fmt.Println(m.p)
+	//spew.Dump(m.root)
 
-//line /tmp/flux.go:1354
+//line flux.go:1352
 			}
 		}
 	}
@@ -1358,7 +1356,7 @@ _again:
 	_out: {}
 	}
 
-//line /tmp/flux.rl:229
+//line flux.rl:227
 
 	if m.cs < first_final  {
 		return nil
