@@ -2,6 +2,7 @@ package fluxparser
 
 import (
 	"fmt"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/influxdata/flux/ast"
 )
 
@@ -11,12 +12,13 @@ machine flux;
 alphtype uint8;
 
 action mark {
-	fmt.Println("mark", m.p, m.pb, m.stack)
+	fmt.Println("mark", m.pb, m.p, m.stack)
 	m.pb = m.p
 }
 
-
 newline = '\n' @{
+	fmt.Println("INSIDEN")
+	m.sol = m.p
     m.curline++;
 };
 
@@ -52,12 +54,17 @@ blkopen = '{' . __;
 blkclose = __ . '}';
 
 # Block declaration. # (todo) > complete
-blkdecl = blkopen >mark @{ fcall closingbrace; }; # fixme> in OR with? => [^{}] |
+blkdecl = blkopen @{ fcall closingbrace; }; # fixme> in OR with? => [^{}] |
 
-closingbrace := (vardecl | optdecl | retdecl | blkdecl)* blkclose >mark @{ fret; };
+closingbrace := (vardecl | optdecl | retdecl | blkdecl)* blkclose @{ fret; };
+
+action ex_statement {
+	fmt.Println("ex_statement")
+	m.statements = append(m.statements, (ast.Statement)(nil))
+}
 
 # Statement. # (todo) > complete
-statement = (vardecl | optdecl | retdecl | blkdecl);
+statement = (vardecl | optdecl | retdecl | blkdecl) %ex_statement;
 
 # # Equality operators.
 # equalityop = ('==' | '!=' | '=~' | '!~');
@@ -99,7 +106,43 @@ statement = (vardecl | optdecl | retdecl | blkdecl);
 
 # logicalexpr = equality (__ logicalop __ equality)*;
 
-main := statement (__ statement __)*;
+action ex_program {
+	fmt.Println("ex_program")
+
+	m.root = &ast.Program{
+		Body:     m.statements,
+		BaseNode: &ast.BaseNode{
+			Loc: &ast.SourceLocation{
+				Start: ast.Position{
+					Line:   m.curline,
+					Column: m.col() - len(*m.text()),
+				},
+				End: ast.Position{
+					Line:   m.curline,
+					Column: m.col(),
+				},
+				Source: m.text(),
+			},
+		},
+	}
+
+	// m.children = nil
+
+	fmt.Println(m.p)
+	spew.Dump(m.root)
+}
+
+# action endprogram {
+# 	m.root.BaseNode.Loc.End = ast.Position{
+# 		Line: m.curline,
+# 		Column: ,
+# 	}
+# 	m.root.BaseNode.Loc.Source = m.text()
+# }
+
+program = (statement >mark (__ statement __)*) %ex_program;
+
+main := program;
 
 }%%
 
@@ -123,7 +166,10 @@ type machine struct {
 	p, pe, eof   int
 	pb           int
     curline      int
+	sol 		 int // Position of the start of line
 	err          error
+	root 	     *ast.Program
+	statements   []ast.Statement 	 
 }
 
 func NewMachine() *machine {
@@ -140,9 +186,19 @@ func NewMachine() *machine {
 	return m
 }
 
+func (m *machine) text() *string {
+	str := string(m.data[m.pb:m.p])
+	return &str
+}
+
+func (m *machine) col() int {
+	return m.p - m.sol
+}
+
 func (m *machine) Parse(input []byte) bool {
 	m.data = input
     m.curline = 1
+	m.sol = 0
 	m.p = 0
 	m.pb = 0
     m.top = 0
@@ -153,9 +209,6 @@ func (m *machine) Parse(input []byte) bool {
 
     %% write init;
     %% write exec;
-	prog:=ast.Program{
-		BaseNode: &BaseNode{}
-	}
 
 	if m.cs < first_final  {
 		return false

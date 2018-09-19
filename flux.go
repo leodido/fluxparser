@@ -2,6 +2,8 @@ package fluxparser
 
 import (
 	"fmt"
+	"github.com/davecgh/go-spew/spew"
+	"github.com/influxdata/flux/ast"
 )
 
 
@@ -21,7 +23,10 @@ type machine struct {
 	p, pe, eof int
 	pb         int
 	curline    int
+	sol        int // Position of the start of line
 	err        error
+	root       *ast.Program
+	statements []ast.Statement
 }
 
 func NewMachine() *machine {
@@ -37,9 +42,19 @@ func NewMachine() *machine {
 	return m
 }
 
+func (m *machine) text() *string {
+	str := string(m.data[m.pb:m.p])
+	return &str
+}
+
+func (m *machine) col() int {
+	return m.p - m.sol
+}
+
 func (m *machine) Parse(input []byte) bool {
 	m.data = input
 	m.curline = 1
+	m.sol = 0
 	m.p = 0
 	m.pb = 0
 	m.top = 0
@@ -242,27 +257,39 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_1:
 		switch (m.data)[(m.p)] {
 		case 95:
-			goto st2
+			goto tr0
 		case 111:
-			goto st4
+			goto tr2
 		case 114:
-			goto st11
+			goto tr3
 		case 123:
 			goto tr4
 		}
 		switch {
 		case (m.data)[(m.p)] > 90:
 			if 97 <= (m.data)[(m.p)] && (m.data)[(m.p)] <= 122 {
-				goto st2
+				goto tr0
 			}
 		case (m.data)[(m.p)] >= 65:
-			goto st2
+			goto tr0
 		}
 		goto st0
 	st_case_0:
 	st0:
 		m.cs = 0
 		goto _out
+	tr0:
+
+		fmt.Println("mark", m.pb, m.p, m.stack)
+		m.pb = m.p
+
+		goto st2
+	tr49:
+
+		fmt.Println("ex_statement")
+		m.statements = append(m.statements, (ast.Statement)(nil))
+
+		goto st2
 	st2:
 		if (m.p)++; (m.p) == (m.pe) {
 			goto _test_eof2
@@ -298,6 +325,8 @@ func (m *machine) Parse(input []byte) bool {
 		goto st0
 	tr6:
 
+		fmt.Println("INSIDEN")
+		m.sol = m.p
 		m.curline++
 
 		goto st3
@@ -318,9 +347,21 @@ func (m *machine) Parse(input []byte) bool {
 			goto st3
 		}
 		goto st0
-	tr51:
+	tr47:
 
+		fmt.Println("ex_statement")
+		m.statements = append(m.statements, (ast.Statement)(nil))
+
+		goto st36
+	tr48:
+
+		fmt.Println("INSIDEN")
+		m.sol = m.p
 		m.curline++
+
+
+		fmt.Println("ex_statement")
+		m.statements = append(m.statements, (ast.Statement)(nil))
 
 		goto st36
 	st36:
@@ -330,31 +371,43 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_36:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr51
+			goto tr48
 		case 32:
-			goto st36
+			goto tr47
 		case 95:
-			goto st2
+			goto tr49
 		case 111:
-			goto st4
+			goto tr50
 		case 114:
-			goto st11
+			goto tr51
 		case 123:
-			goto tr4
+			goto tr52
 		}
 		switch {
 		case (m.data)[(m.p)] < 65:
 			if 9 <= (m.data)[(m.p)] && (m.data)[(m.p)] <= 13 {
-				goto st36
+				goto tr47
 			}
 		case (m.data)[(m.p)] > 90:
 			if 97 <= (m.data)[(m.p)] && (m.data)[(m.p)] <= 122 {
-				goto st2
+				goto tr49
 			}
 		default:
-			goto st2
+			goto tr49
 		}
 		goto st0
+	tr2:
+
+		fmt.Println("mark", m.pb, m.p, m.stack)
+		m.pb = m.p
+
+		goto st4
+	tr50:
+
+		fmt.Println("ex_statement")
+		m.statements = append(m.statements, (ast.Statement)(nil))
+
+		goto st4
 	st4:
 		if (m.p)++; (m.p) == (m.pe) {
 			goto _test_eof4
@@ -537,7 +590,7 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_9:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr14
+			goto tr15
 		case 32:
 			goto st10
 		case 61:
@@ -563,8 +616,10 @@ func (m *machine) Parse(input []byte) bool {
 			goto st2
 		}
 		goto st0
-	tr14:
+	tr15:
 
+		fmt.Println("INSIDEN")
+		m.sol = m.p
 		m.curline++
 
 		goto st10
@@ -575,7 +630,7 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_10:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr14
+			goto tr15
 		case 32:
 			goto st10
 		case 61:
@@ -596,6 +651,18 @@ func (m *machine) Parse(input []byte) bool {
 			goto st2
 		}
 		goto st0
+	tr3:
+
+		fmt.Println("mark", m.pb, m.p, m.stack)
+		m.pb = m.p
+
+		goto st11
+	tr51:
+
+		fmt.Println("ex_statement")
+		m.statements = append(m.statements, (ast.Statement)(nil))
+
+		goto st11
 	st11:
 		if (m.p)++; (m.p) == (m.pe) {
 			goto _test_eof11
@@ -778,33 +845,33 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_37:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr53
+			goto tr54
 		case 32:
-			goto st38
+			goto tr53
 		case 61:
 			goto st36
 		case 95:
-			goto st2
+			goto tr49
 		case 111:
-			goto st4
+			goto tr50
 		case 114:
-			goto st11
+			goto tr51
 		case 123:
-			goto tr4
+			goto tr52
 		}
 		switch {
 		case (m.data)[(m.p)] < 48:
 			if 9 <= (m.data)[(m.p)] && (m.data)[(m.p)] <= 13 {
-				goto st38
+				goto tr53
 			}
 		case (m.data)[(m.p)] > 57:
 			switch {
 			case (m.data)[(m.p)] > 90:
 				if 97 <= (m.data)[(m.p)] && (m.data)[(m.p)] <= 122 {
-					goto st2
+					goto tr49
 				}
 			case (m.data)[(m.p)] >= 65:
-				goto st2
+				goto tr49
 			}
 		default:
 			goto st2
@@ -812,7 +879,19 @@ func (m *machine) Parse(input []byte) bool {
 		goto st0
 	tr53:
 
+		fmt.Println("ex_statement")
+		m.statements = append(m.statements, (ast.Statement)(nil))
+
+		goto st38
+	tr54:
+
+		fmt.Println("INSIDEN")
+		m.sol = m.p
 		m.curline++
+
+
+		fmt.Println("ex_statement")
+		m.statements = append(m.statements, (ast.Statement)(nil))
 
 		goto st38
 	st38:
@@ -822,36 +901,36 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_38:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr53
+			goto tr54
 		case 32:
-			goto st38
+			goto tr53
 		case 61:
 			goto st36
 		case 95:
-			goto st2
+			goto tr49
 		case 111:
-			goto st4
+			goto tr50
 		case 114:
-			goto st11
+			goto tr51
 		case 123:
-			goto tr4
+			goto tr52
 		}
 		switch {
 		case (m.data)[(m.p)] < 65:
 			if 9 <= (m.data)[(m.p)] && (m.data)[(m.p)] <= 13 {
-				goto st38
+				goto tr53
 			}
 		case (m.data)[(m.p)] > 90:
 			if 97 <= (m.data)[(m.p)] && (m.data)[(m.p)] <= 122 {
-				goto st2
+				goto tr49
 			}
 		default:
-			goto st2
+			goto tr49
 		}
 		goto st0
 	tr4:
 
-		fmt.Println("mark", m.p, m.pb, m.stack)
+		fmt.Println("mark", m.pb, m.p, m.stack)
 		m.pb = m.p
 
 		{
@@ -863,7 +942,11 @@ func (m *machine) Parse(input []byte) bool {
 			}
 		}
 		goto st39
-	tr54:
+	tr52:
+
+		fmt.Println("ex_statement")
+		m.statements = append(m.statements, (ast.Statement)(nil))
+
 		{
 			m.stack = append(m.stack, 0)
 			{
@@ -874,7 +957,23 @@ func (m *machine) Parse(input []byte) bool {
 		}
 		goto st39
 	tr55:
+		{
+			m.stack = append(m.stack, 0)
+			{
+				(m.stack)[(m.top)] = 39
+				(m.top)++
+				goto st16
+			}
+		}
 
+		fmt.Println("ex_statement")
+		m.statements = append(m.statements, (ast.Statement)(nil))
+
+		goto st39
+	tr56:
+
+		fmt.Println("INSIDEN")
+		m.sol = m.p
 		m.curline++
 
 		{
@@ -885,6 +984,10 @@ func (m *machine) Parse(input []byte) bool {
 				goto st16
 			}
 		}
+
+		fmt.Println("ex_statement")
+		m.statements = append(m.statements, (ast.Statement)(nil))
+
 		goto st39
 	st39:
 		if (m.p)++; (m.p) == (m.pe) {
@@ -893,29 +996,29 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_39:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr55
+			goto tr56
 		case 32:
-			goto tr54
+			goto tr55
 		case 95:
-			goto st2
+			goto tr49
 		case 111:
-			goto st4
+			goto tr50
 		case 114:
-			goto st11
+			goto tr51
 		case 123:
-			goto tr4
+			goto tr52
 		}
 		switch {
 		case (m.data)[(m.p)] < 65:
 			if 9 <= (m.data)[(m.p)] && (m.data)[(m.p)] <= 13 {
-				goto tr54
+				goto tr55
 			}
 		case (m.data)[(m.p)] > 90:
 			if 97 <= (m.data)[(m.p)] && (m.data)[(m.p)] <= 122 {
-				goto st2
+				goto tr49
 			}
 		default:
-			goto st2
+			goto tr49
 		}
 		goto st0
 	st16:
@@ -925,9 +1028,9 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_16:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr21
+			goto tr22
 		case 32:
-			goto tr20
+			goto st17
 		case 95:
 			goto st18
 		case 111:
@@ -935,14 +1038,14 @@ func (m *machine) Parse(input []byte) bool {
 		case 114:
 			goto st28
 		case 123:
-			goto tr25
-		case 125:
 			goto tr26
+		case 125:
+			goto tr27
 		}
 		switch {
 		case (m.data)[(m.p)] < 65:
 			if 9 <= (m.data)[(m.p)] && (m.data)[(m.p)] <= 13 {
-				goto tr20
+				goto st17
 			}
 		case (m.data)[(m.p)] > 90:
 			if 97 <= (m.data)[(m.p)] && (m.data)[(m.p)] <= 122 {
@@ -952,23 +1055,10 @@ func (m *machine) Parse(input []byte) bool {
 			goto st18
 		}
 		goto st0
-	tr28:
+	tr22:
 
-		m.curline++
-
-		goto st17
-	tr20:
-
-		fmt.Println("mark", m.p, m.pb, m.stack)
-		m.pb = m.p
-
-		goto st17
-	tr21:
-
-		fmt.Println("mark", m.p, m.pb, m.stack)
-		m.pb = m.p
-
-
+		fmt.Println("INSIDEN")
+		m.sol = m.p
 		m.curline++
 
 		goto st17
@@ -979,31 +1069,17 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_17:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr28
+			goto tr22
 		case 32:
 			goto st17
 		case 125:
-			goto tr29
+			goto tr27
 		}
 		if 9 <= (m.data)[(m.p)] && (m.data)[(m.p)] <= 13 {
 			goto st17
 		}
 		goto st0
-	tr26:
-
-		fmt.Println("mark", m.p, m.pb, m.stack)
-		m.pb = m.p
-
-		{
-			(m.top)--
-			m.cs = (m.stack)[(m.top)]
-			{
-				m.stack = m.stack[:len(m.stack)-1]
-			}
-			goto _again
-		}
-		goto st40
-	tr29:
+	tr27:
 		{
 			(m.top)--
 			m.cs = (m.stack)[(m.top)]
@@ -1026,7 +1102,7 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_18:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr31
+			goto tr29
 		case 32:
 			goto st19
 		case 61:
@@ -1052,8 +1128,10 @@ func (m *machine) Parse(input []byte) bool {
 			goto st18
 		}
 		goto st0
-	tr31:
+	tr29:
 
+		fmt.Println("INSIDEN")
+		m.sol = m.p
 		m.curline++
 
 		goto st19
@@ -1064,7 +1142,7 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_19:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr31
+			goto tr29
 		case 32:
 			goto st19
 		case 61:
@@ -1074,19 +1152,11 @@ func (m *machine) Parse(input []byte) bool {
 			goto st19
 		}
 		goto st0
-	tr33:
+	tr31:
 
-		fmt.Println("mark", m.p, m.pb, m.stack)
-		m.pb = m.p
-
-		goto st20
-	tr34:
-
+		fmt.Println("INSIDEN")
+		m.sol = m.p
 		m.curline++
-
-
-		fmt.Println("mark", m.p, m.pb, m.stack)
-		m.pb = m.p
 
 		goto st20
 	st20:
@@ -1096,9 +1166,9 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_20:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr34
+			goto tr31
 		case 32:
-			goto tr33
+			goto st20
 		case 95:
 			goto st18
 		case 111:
@@ -1106,14 +1176,14 @@ func (m *machine) Parse(input []byte) bool {
 		case 114:
 			goto st28
 		case 123:
-			goto tr25
-		case 125:
 			goto tr26
+		case 125:
+			goto tr27
 		}
 		switch {
 		case (m.data)[(m.p)] < 65:
 			if 9 <= (m.data)[(m.p)] && (m.data)[(m.p)] <= 13 {
-				goto tr33
+				goto st20
 			}
 		case (m.data)[(m.p)] > 90:
 			if 97 <= (m.data)[(m.p)] && (m.data)[(m.p)] <= 122 {
@@ -1130,7 +1200,7 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_21:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr31
+			goto tr29
 		case 32:
 			goto st19
 		case 61:
@@ -1165,7 +1235,7 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_22:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr31
+			goto tr29
 		case 32:
 			goto st19
 		case 61:
@@ -1200,7 +1270,7 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_23:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr31
+			goto tr29
 		case 32:
 			goto st19
 		case 61:
@@ -1235,7 +1305,7 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_24:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr31
+			goto tr29
 		case 32:
 			goto st19
 		case 61:
@@ -1270,7 +1340,7 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_25:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr31
+			goto tr29
 		case 32:
 			goto st19
 		case 61:
@@ -1305,7 +1375,7 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_26:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr41
+			goto tr38
 		case 32:
 			goto st27
 		case 61:
@@ -1331,8 +1401,10 @@ func (m *machine) Parse(input []byte) bool {
 			goto st18
 		}
 		goto st0
-	tr41:
+	tr38:
 
+		fmt.Println("INSIDEN")
+		m.sol = m.p
 		m.curline++
 
 		goto st27
@@ -1343,7 +1415,7 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_27:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr41
+			goto tr38
 		case 32:
 			goto st27
 		case 61:
@@ -1371,7 +1443,7 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_28:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr31
+			goto tr29
 		case 32:
 			goto st19
 		case 61:
@@ -1406,7 +1478,7 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_29:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr31
+			goto tr29
 		case 32:
 			goto st19
 		case 61:
@@ -1441,7 +1513,7 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_30:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr31
+			goto tr29
 		case 32:
 			goto st19
 		case 61:
@@ -1476,7 +1548,7 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_31:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr31
+			goto tr29
 		case 32:
 			goto st19
 		case 61:
@@ -1511,7 +1583,7 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_32:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr31
+			goto tr29
 		case 32:
 			goto st19
 		case 61:
@@ -1546,9 +1618,9 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_33:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr48
+			goto tr45
 		case 32:
-			goto tr47
+			goto st34
 		case 61:
 			goto st20
 		case 95:
@@ -1558,14 +1630,14 @@ func (m *machine) Parse(input []byte) bool {
 		case 114:
 			goto st28
 		case 123:
-			goto tr25
-		case 125:
 			goto tr26
+		case 125:
+			goto tr27
 		}
 		switch {
 		case (m.data)[(m.p)] < 48:
 			if 9 <= (m.data)[(m.p)] && (m.data)[(m.p)] <= 13 {
-				goto tr47
+				goto st34
 			}
 		case (m.data)[(m.p)] > 57:
 			switch {
@@ -1580,19 +1652,11 @@ func (m *machine) Parse(input []byte) bool {
 			goto st18
 		}
 		goto st0
-	tr47:
+	tr45:
 
-		fmt.Println("mark", m.p, m.pb, m.stack)
-		m.pb = m.p
-
-		goto st34
-	tr48:
-
+		fmt.Println("INSIDEN")
+		m.sol = m.p
 		m.curline++
-
-
-		fmt.Println("mark", m.p, m.pb, m.stack)
-		m.pb = m.p
 
 		goto st34
 	st34:
@@ -1602,9 +1666,9 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_34:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr48
+			goto tr45
 		case 32:
-			goto tr47
+			goto st34
 		case 61:
 			goto st20
 		case 95:
@@ -1614,14 +1678,14 @@ func (m *machine) Parse(input []byte) bool {
 		case 114:
 			goto st28
 		case 123:
-			goto tr25
-		case 125:
 			goto tr26
+		case 125:
+			goto tr27
 		}
 		switch {
 		case (m.data)[(m.p)] < 65:
 			if 9 <= (m.data)[(m.p)] && (m.data)[(m.p)] <= 13 {
-				goto tr47
+				goto st34
 			}
 		case (m.data)[(m.p)] > 90:
 			if 97 <= (m.data)[(m.p)] && (m.data)[(m.p)] <= 122 {
@@ -1631,11 +1695,7 @@ func (m *machine) Parse(input []byte) bool {
 			goto st18
 		}
 		goto st0
-	tr25:
-
-		fmt.Println("mark", m.p, m.pb, m.stack)
-		m.pb = m.p
-
+	tr26:
 		{
 			m.stack = append(m.stack, 0)
 			{
@@ -1645,22 +1705,10 @@ func (m *machine) Parse(input []byte) bool {
 			}
 		}
 		goto st35
-	tr49:
-		{
-			m.stack = append(m.stack, 0)
-			{
-				(m.stack)[(m.top)] = 35
-				(m.top)++
-				goto st16
-			}
-		}
+	tr46:
 
-		fmt.Println("mark", m.p, m.pb, m.stack)
-		m.pb = m.p
-
-		goto st35
-	tr50:
-
+		fmt.Println("INSIDEN")
+		m.sol = m.p
 		m.curline++
 
 		{
@@ -1671,10 +1719,6 @@ func (m *machine) Parse(input []byte) bool {
 				goto st16
 			}
 		}
-
-		fmt.Println("mark", m.p, m.pb, m.stack)
-		m.pb = m.p
-
 		goto st35
 	st35:
 		if (m.p)++; (m.p) == (m.pe) {
@@ -1683,9 +1727,9 @@ func (m *machine) Parse(input []byte) bool {
 	st_case_35:
 		switch (m.data)[(m.p)] {
 		case 10:
-			goto tr50
+			goto tr46
 		case 32:
-			goto tr49
+			goto tr26
 		case 95:
 			goto st18
 		case 111:
@@ -1693,14 +1737,14 @@ func (m *machine) Parse(input []byte) bool {
 		case 114:
 			goto st28
 		case 123:
-			goto tr25
-		case 125:
 			goto tr26
+		case 125:
+			goto tr27
 		}
 		switch {
 		case (m.data)[(m.p)] < 65:
 			if 9 <= (m.data)[(m.p)] && (m.data)[(m.p)] <= 13 {
-				goto tr49
+				goto tr26
 			}
 		case (m.data)[(m.p)] > 90:
 			if 97 <= (m.data)[(m.p)] && (m.data)[(m.p)] <= 122 {
@@ -1835,6 +1879,41 @@ func (m *machine) Parse(input []byte) bool {
 	_test_eof:
 		{
 		}
+		if (m.p) == (m.eof) {
+			switch m.cs {
+			case 36, 37, 38, 39:
+
+				fmt.Println("ex_statement")
+				m.statements = append(m.statements, (ast.Statement)(nil))
+
+
+				fmt.Println("ex_program")
+
+				m.root = &ast.Program{
+					Body: m.statements,
+					BaseNode: &ast.BaseNode{
+						Loc: &ast.SourceLocation{
+							Start: ast.Position{
+								Line:   m.curline,
+								Column: m.col() - len(*m.text()),
+							},
+							End: ast.Position{
+								Line:   m.curline,
+								Column: m.col(),
+							},
+							Source: m.text(),
+						},
+					},
+				}
+
+				// m.children = nil
+
+				fmt.Println(m.p)
+				spew.Dump(m.root)
+
+			}
+		}
+
 	_out:
 		{
 		}
