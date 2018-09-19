@@ -26,8 +26,16 @@ func TestParse(t *testing.T) {
 		// `,
 		// 		},
 		{
-			name: "block declaration",
-			raw:  `{ { } }`,
+			name: "empty block statement",
+			raw:  `{}`,
+		},
+		{
+			name: "one block statement",
+			raw:  `{ }`,
+		},
+		{
+			name: "nest block statements",
+			raw:  `{{}}`,
 		},
 	}
 

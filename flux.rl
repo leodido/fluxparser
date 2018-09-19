@@ -45,13 +45,57 @@ optdecl = 'option' __ vardecl;
 # Return statement. # (todo) > complete
 retdecl = 'return' __;
 
-# Block declaration. # (todo) > complete
-blkdecl = '{' __ >mark @{ fcall closingbrace; }; # [^{}] |
+blkopen = '{' __;
 
-closingbrace := blkdecl* __ '}' >mark @{ fret; };
+blkclose = __ '}';
+
+# Block declaration. # (todo) > complete
+blkdecl = blkopen >mark @{ fcall closingbrace; }; # fixme> in OR with? => [^{}] |
+
+closingbrace := blkdecl* blkclose >mark @{ fret; };
 
 # Statement. # (todo) > complete
 statement = (vardecl | optdecl | retdecl | blkdecl);
+
+# # Equality operators.
+# equalityop = ('==' | '!=' | '=~' | '!~');
+
+# # Logical operators.
+# relationalop = '<=' | '<' | '>=' | '>' | 'startswith' | 'STARTSWITH' | 'in' | 'IN' | 'not empty' | 'NOT EMPTY' | 'empty' | 'EMPTY';
+
+# # Additivie operators.
+# additiveop = '+' | '-';
+
+# # Multiplicative operators.
+# multiplicativeop = '*' | '/';
+
+# # Unary operators.
+# unaryop = '-' | 'not';
+
+# # Logical operators.
+# logicalop = 'or' | 'OR' | 'and' | 'AND';
+
+# array = '[' __ arrayelems? __ ']';
+
+# primary = array | literal; # (todo) > complete ... pipexpr | array | literal | ...
+
+# arrayrest = ',' __ primary;
+
+# arrayelems = primary __ arrayrest*;
+
+# literal = stringliteral; # (todo) > complete ... | booleanliteral | regexpliteral
+
+# unaryexpr = __ unaryop __ primary | primary;
+
+# multiplicative = unaryexpr (__ multiplicativeop __ unaryexpr)*;
+
+# additive = multiplicative (__ additiveop __ multiplicative)*;
+
+# relational = additive (__ relationalop __ additive)*;
+
+# equality = relational (__ equalityop __ relational)*;
+
+# logicalexpr = equality (__ logicalop __ equality)*;
 
 main := statement (__ statement __)*;
 
@@ -60,6 +104,10 @@ main := statement (__ statement __)*;
 %%{
 prepush {
 	m.stack = append(m.stack, 0)
+}
+
+postpop {
+	m.stack = m.stack[:len(m.stack) - 1]
 }
 }%%
 
