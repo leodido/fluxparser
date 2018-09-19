@@ -35,7 +35,13 @@ alpha_ = alpha | '_';
 # String literal.
 stringliteral = [^"\\] | !newline | ('\\"');
 
-doublestringchar = '"' . stringliteral* . '"';
+action ex_doublestringchar {
+	m.expression = &ast.StringLiteral{
+		Value: string(m.text()),
+	}
+}
+
+doublestringchar = '"' . stringliteral* >mark %ex_doublestringchar . '"';
 
 # Identifier.
 identifier = alpha_ . alnum_*;
@@ -58,45 +64,58 @@ unaryop = '-' | 'not';
 # # Logical operators.
 logicalop = 'or' | 'OR' | 'and' | 'AND';
 
-literal = stringliteral; # (todo) > complete ... | booleanliteral | regexpliteral
+literal = doublestringchar; # (todo) > complete ... | booleanliteral | regexpliteral
 
 primary = literal; # (todo) > complete ... pipexpr | array | literal | ...
 
-unaryexpr = __ unaryop __ primary | primary;
+# unaryexpr = __ unaryop __ primary | primary;
 
-multiplicative = unaryexpr (__ multiplicativeop __ unaryexpr)*;
+# multiplicative = unaryexpr (__ multiplicativeop __ unaryexpr)*;
 
-additive = multiplicative (__ additiveop __ multiplicative)*;
+# additive = multiplicative (__ additiveop __ multiplicative)*;
 
-relational = additive (__ relationalop __ additive)*;
+# relational = additive (__ relationalop __ additive)*;
 
-equality = relational (__ equalityop __ relational)*;
+# equality = relational (__ equalityop __ relational)*;
 
-logicalexpr = equality (__ logicalop __ equality)*;
+# logicalexpr = equality . (__ logicalop __ equality)*;
+
+# Expression statement.
+# expdecl = logicalexpr;
+
+# fixme > we are in a rush
+expr = literal;
+expdecl = expr;
+
+action ex_identifier {
+	m.identifier = &ast.Identifier{
+		Name: string(m.text()),
+		// BaseNode: base(m.text(), m.curline, m.col()),
+	}
+}
 
 action ex_vardecl{
-	m.statements = append(m.statement, ast.VariableDeclaration{
+	m.statements = append(m.statements, &ast.VariableDeclaration{
 		Declarations: []*ast.VariableDeclarator{
 			&ast.VariableDeclarator{
-				ID:   nil,
-				Init: nil,
+				ID:   m.identifier,
+				Init: m.expression,
 			},
 		},
-		BaseNode: base(m.text(), m.curline, m.col()),
+		// BaseNode: base(m.text(), m.curline, m.col()),
 	})
+	m.identifier = nil
+	m.expression = nil
 }
 
 # Variable declaration. # (todo) > complete
-vardecl = identifier >mark . __ . '=' . __ %ex_vardecl;
+vardecl = (identifier >mark %ex_identifier . __ . '=' . __ . expr) %ex_vardecl;
 
 # Option statement. # (todo) > complete
 optdecl = 'option' __ vardecl;
 
 # Return statement. # (todo) > complete
 retdecl = 'return' __;
-
-# Expression statement.
-expdecl = logicalexpr;
 
 blkopen = '{' . __;
 
@@ -105,7 +124,7 @@ blkclose = __ . '}';
 # Block declaration.
 blkdecl = blkopen @{ fcall closingbrace; }; # fixme> in OR with? => [^{}] |
 
-closingbrace := (vardecl | optdecl | retdecl | expdecl | blkdecl)* . blkclose @{ fret; };
+closingbrace := (vardecl | optdecl | retdecl | blkdecl)* . blkclose @{ fret; };
 
 # action ex_statement {
 # 	fmt.Println("ex_statement")
@@ -113,14 +132,14 @@ closingbrace := (vardecl | optdecl | retdecl | expdecl | blkdecl)* . blkclose @{
 # }
 
 # Statement.
-statement = (vardecl | optdecl | retdecl | expdecl | blkdecl);
+statement = (vardecl | optdecl | retdecl | blkdecl);
 
 action ex_program {
 	fmt.Println("ex_program")
 
 	m.root = &ast.Program{
 		Body:     m.statements,
-		BaseNode: base(m.text(), m.curline, m.col()),
+		// BaseNode: base(m.text(), m.curline, m.col()),
 	}
 
 	// m.children = nil
@@ -167,6 +186,8 @@ type machine struct {
 	err          error
 	root 	     *ast.Program
 	statements   []ast.Statement 	 
+	identifier   *ast.Identifier
+	expression   ast.Expression
 }
 
 func NewMachine() *machine {
@@ -191,7 +212,7 @@ func (m *machine) col() int {
 	return m.p - m.sol
 }
 
-func (m *machine) Parse(input []byte) bool {
+func (m *machine) Parse(input []byte) *ast.Program {
 	m.data = input
     m.curline = 1
 	m.sol = 0
@@ -207,8 +228,8 @@ func (m *machine) Parse(input []byte) bool {
     %% write exec;
 
 	if m.cs < first_final  {
-		return false
+		return nil
 	}
 
-	return true
+	return m.root
 }

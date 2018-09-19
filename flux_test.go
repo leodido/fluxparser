@@ -1,14 +1,18 @@
 package fluxparser
 
 import (
-	"fmt"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
+	"github.com/influxdata/flux/ast"
+	"github.com/influxdata/flux/ast/asttest"
 )
 
 func TestParse(t *testing.T) {
 	tests := []struct {
 		name    string
 		raw     string
+		want    *ast.Program
 		wantErr bool
 	}{
 		// 		{
@@ -25,10 +29,10 @@ func TestParse(t *testing.T) {
 		// join(tables:[a,b], on:["t1"], fn: (a,b) => (a["_field"] - b["_field"]) / b["_field"])
 		// `,
 		// 		},
-		{
-			name: "empty block statement",
-			raw:  `{}`,
-		},
+		// {
+		// 	name: "empty block statement",
+		// 	raw:  `{}`,
+		// },
 		// {
 		// 	name: "one block statement",
 		// 	raw:  `{ }`,
@@ -37,10 +41,21 @@ func TestParse(t *testing.T) {
 		// 	name: "nest block statements",
 		// 	raw:  `{{}}`,
 		// },
-		// {
-		// 	name: "variable declaration",
-		// 	raw:  `docmerlin =`,
-		// },
+		{
+			name: "use variable to declare something",
+			raw:  `howdy = "1"`,
+			want: &ast.Program{
+				Body: []ast.Statement{
+					&ast.VariableDeclaration{
+						Declarations: []*ast.VariableDeclarator{{
+							ID:   &ast.Identifier{Name: "howdy"},
+							Init: &ast.StringLiteral{Value: "1"},
+						}},
+					},
+				},
+			},
+		},
+
 		// {
 		// 	name: "variable declaration",
 		// 	raw:  `leodido = `,
@@ -58,7 +73,12 @@ func TestParse(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// t.Parallel()
 
-			fmt.Println(mach.Parse([]byte(tt.raw)))
+			if !tt.wantErr {
+				got := mach.Parse([]byte(tt.raw))
+				if !cmp.Equal(tt.want, got, asttest.CompareOptions...) {
+					t.Errorf("parser.NewAST() = -want/+got %s", cmp.Diff(tt.want, got, asttest.CompareOptions...))
+				}
+			}
 
 		})
 	}
