@@ -40,8 +40,54 @@ doublestringchar = '"' . stringliteral* . '"';
 # Identifier.
 identifier = alpha_ . alnum_*;
 
+# Equality operators.
+equalityop = ('==' | '!=' | '=~' | '!~');
+
+# # Logical operators.
+relationalop = '<=' | '<' | '>=' | '>' | 'startswith' | 'STARTSWITH' | 'in' | 'IN' | 'not empty' | 'NOT EMPTY' | 'empty' | 'EMPTY';
+
+# # Additivie operators.
+additiveop = '+' | '-';
+
+# # Multiplicative operators.
+multiplicativeop = '*' | '/';
+
+# # Unary operators.
+unaryop = '-' | 'not';
+
+# # Logical operators.
+logicalop = 'or' | 'OR' | 'and' | 'AND';
+
+literal = stringliteral; # (todo) > complete ... | booleanliteral | regexpliteral
+
+primary = literal; # (todo) > complete ... pipexpr | array | literal | ...
+
+unaryexpr = __ unaryop __ primary | primary;
+
+multiplicative = unaryexpr (__ multiplicativeop __ unaryexpr)*;
+
+additive = multiplicative (__ additiveop __ multiplicative)*;
+
+relational = additive (__ relationalop __ additive)*;
+
+equality = relational (__ equalityop __ relational)*;
+
+logicalexpr = equality (__ logicalop __ equality)*;
+
+action ex_vardecl{
+	m.statements = append(m.statement, ast.VariableDeclaration{
+		Declarations: []*ast.VariableDeclarator{
+			&ast.VariableDeclarator{
+				ID:   nil,
+				Init: nil,
+			},
+		},
+		BaseNode: base(m.text(), m.curline, m.col()),
+	})
+}
+
 # Variable declaration. # (todo) > complete
-vardecl = identifier . __ . '=' . __ %ex_vardecl;
+vardecl = identifier >mark . __ . '=' . __ %ex_vardecl;
 
 # Option statement. # (todo) > complete
 optdecl = 'option' __ vardecl;
@@ -49,85 +95,32 @@ optdecl = 'option' __ vardecl;
 # Return statement. # (todo) > complete
 retdecl = 'return' __;
 
+# Expression statement.
+expdecl = logicalexpr;
+
 blkopen = '{' . __;
 
 blkclose = __ . '}';
 
-# Block declaration. # (todo) > complete
+# Block declaration.
 blkdecl = blkopen @{ fcall closingbrace; }; # fixme> in OR with? => [^{}] |
 
-closingbrace := (vardecl | optdecl | retdecl | blkdecl)* blkclose @{ fret; };
+closingbrace := (vardecl | optdecl | retdecl | expdecl | blkdecl)* . blkclose @{ fret; };
 
 # action ex_statement {
 # 	fmt.Println("ex_statement")
 #	m.statements = append(m.statements, (ast.Statement)(nil))
 # }
 
-action ex_vardecl{
-	m.statements = append(m.statement, ast.VariableDeclaration{}
-}
-
-# Statement. # (todo) > complete
-statement = (vardecl | optdecl | retdecl | blkdecl); #%ex_statement;
-
-# # Equality operators.
-# equalityop = ('==' | '!=' | '=~' | '!~');
-
-# # Logical operators.
-# relationalop = '<=' | '<' | '>=' | '>' | 'startswith' | 'STARTSWITH' | 'in' | 'IN' | 'not empty' | 'NOT EMPTY' | 'empty' | 'EMPTY';
-
-# # Additivie operators.
-# additiveop = '+' | '-';
-
-# # Multiplicative operators.
-# multiplicativeop = '*' | '/';
-
-# # Unary operators.
-# unaryop = '-' | 'not';
-
-# # Logical operators.
-# logicalop = 'or' | 'OR' | 'and' | 'AND';
-
-# array = '[' __ arrayelems? __ ']';
-
-# primary = array | literal; # (todo) > complete ... pipexpr | array | literal | ...
-
-# arrayrest = ',' __ primary;
-
-# arrayelems = primary __ arrayrest*;
-
-# literal = stringliteral; # (todo) > complete ... | booleanliteral | regexpliteral
-
-# unaryexpr = __ unaryop __ primary | primary;
-
-# multiplicative = unaryexpr (__ multiplicativeop __ unaryexpr)*;
-
-# additive = multiplicative (__ additiveop __ multiplicative)*;
-
-# relational = additive (__ relationalop __ additive)*;
-
-# equality = relational (__ equalityop __ relational)*;
-
-# logicalexpr = equality (__ logicalop __ equality)*;
+# Statement.
+statement = (vardecl | optdecl | retdecl | expdecl | blkdecl);
 
 action ex_program {
 	fmt.Println("ex_program")
 
 	m.root = &ast.Program{
 		Body:     m.statements,
-		BaseNode: &ast.BaseNode{
-			Loc: &ast.SourceLocation{
-				Start: ast.Position{
-					Line:   m.curline,
-					Column: m.col() - len(*m.text()),
-				},
-				End: ast.Position{
-					Line:   m.curline,
-					Column: m.col(),
-				},
-				Source: m.text(),
-			},
-		},
+		BaseNode: base(m.text(), m.curline, m.col()),
 	}
 
 	// m.children = nil
@@ -190,9 +183,8 @@ func NewMachine() *machine {
 	return m
 }
 
-func (m *machine) text() *string {
-	str := string(m.data[m.pb:m.p])
-	return &str
+func (m *machine) text() []byte {
+	return m.data[m.pb:m.p]
 }
 
 func (m *machine) col() int {
