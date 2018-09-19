@@ -1,4 +1,8 @@
-package pflux
+package fluxparser
+
+import (
+	"fmt"
+)
 
 %%{
 machine flux;
@@ -6,6 +10,7 @@ machine flux;
 alphtype uint8;
 
 action mark {
+	fmt.Println("mark", m.p, m.pb, m.stack)
 	m.pb = m.p
 }
 
@@ -41,15 +46,21 @@ optdecl = 'option' __ vardecl;
 retdecl = 'return' __;
 
 # Block declaration. # (todo) > complete
-blkdecl = [^{}] | '{' __ @{ fcall closingbrace; };
+blkdecl = '{' __ >mark @{ fcall closingbrace; }; # [^{}] |
 
-closingbrace := blkdecl* __ '}' @{ fret; };
+closingbrace := blkdecl* __ '}' >mark @{ fret; };
 
 # Statement. # (todo) > complete
 statement = (vardecl | optdecl | retdecl | blkdecl);
 
 main := statement (__ statement __)*;
 
+}%%
+
+%%{
+prepush {
+	m.stack = append(m.stack, 0)
+}
 }%%
 
 %% write data noprefix noerror;
@@ -85,7 +96,7 @@ func (m *machine) Parse(input []byte) bool {
 	m.p = 0
 	m.pb = 0
     m.top = 0
-    m.stack = make([]int)
+    m.stack = nil
 	m.pe = len(input)
 	m.eof = len(input)
 	m.err = nil
