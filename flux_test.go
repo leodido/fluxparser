@@ -41,20 +41,20 @@ func TestParse(t *testing.T) {
 		// 	name: "nest block statements",
 		// 	raw:  `{{}}`,
 		// },
-		{
-			name: "use variable to declare something",
-			raw:  `howdy = "1"`,
-			want: &ast.Program{
-				Body: []ast.Statement{
-					&ast.VariableDeclaration{
-						Declarations: []*ast.VariableDeclarator{{
-							ID:   &ast.Identifier{Name: "howdy"},
-							Init: &ast.StringLiteral{Value: "1"},
-						}},
-					},
-				},
-			},
-		},
+		// {
+		// 	name: "use variable to declare something",
+		// 	raw:  `howdy = "1"`,
+		// 	want: &ast.Program{
+		// 		Body: []ast.Statement{
+		// 			&ast.VariableDeclaration{
+		// 				Declarations: []*ast.VariableDeclarator{{
+		// 					ID:   &ast.Identifier{Name: "howdy"},
+		// 					Init: &ast.StringLiteral{Value: "1"},
+		// 				}},
+		// 			},
+		// 		},
+		// 	},
+		// },
 
 		// {
 		// 	name: "variable declaration",
@@ -64,6 +64,21 @@ func TestParse(t *testing.T) {
 		// 	name: "variable declaration",
 		// 	raw:  `{docmerlin =}`,
 		// },
+		{
+			name: "use variable to declare something",
+			raw:  `from()`,
+			want: &ast.Program{
+				Body: []ast.Statement{
+					&ast.ExpressionStatement{
+						Expression: &ast.CallExpression{
+							Callee: &ast.Identifier{
+								Name: "from",
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	mach := NewMachine()

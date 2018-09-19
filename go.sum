@@ -3,6 +3,7 @@ github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883/go.mod h1:rCTlJbsFo
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
 github.com/c-bata/go-prompt v0.2.2/go.mod h1:VzqtzE2ksDBcdln8G7mk2RX9QyGjH+OVqOCSiVIqS34=
 github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=
+github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/gogo/protobuf v1.1.1/go.mod h1:r8qH/GZQm5c6nD/R0oafs1akxWv10x8SbQlK7atdtwQ=
 github.com/golang/protobuf v1.2.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
@@ -16,7 +17,10 @@ github.com/gonum/lapack v0.0.0-20180125091020-f0b8b25edece/go.mod h1:XA3DeT6rxh2
 github.com/gonum/mathext v0.0.0-20180126232648-3ffefb3e36fc/go.mod h1:fmo8aiSEWkJeiGXUJf+sPvuDgEFgqIoZSs843ePKrGg=
 github.com/gonum/matrix v0.0.0-20180124231301-a41cc49d4c29/go.mod h1:0EXg4mc1CNP0HCqCz+K4ts155PXIlUywf0wqN+GfPZw=
 github.com/gonum/stat v0.0.0-20180125090729-ec9c8a1062f4/go.mod h1:Z4GIJBJO3Wa4gD4vbwQxXXZ+WHmW6E9ixmNrwvs0iZs=
+github.com/google/go-cmp v0.2.0 h1:+dTQ8DZQJz0Mb/HjFlkptS1FeQ4cWSnN941F8aEG4SQ=
 github.com/google/go-cmp v0.2.0/go.mod h1:oXzfMopK8JAjlY9xF4vHSVASa0yLyX7SntLO5aqRK0M=
+github.com/google/go-cmp v0.2.1-0.20180911194814-875f8df8b796 h1:12DMk0ITaLP10rk+kjf4r/0piS+ZCFLtkvMb3wg8WP8=
+github.com/google/go-cmp v0.2.1-0.20180911194814-875f8df8b796/go.mod h1:oXzfMopK8JAjlY9xF4vHSVASa0yLyX7SntLO5aqRK0M=
 github.com/influxdata/flux v0.0.0-20180919184337-907ed5dc2305 h1:XpWUkdzCdPOw9YrYr/rh4vlN91edc3FzSXpUIn/ZT+o=
 github.com/influxdata/flux v0.0.0-20180919184337-907ed5dc2305/go.mod h1:INqOzJeMwzRrdqUu9bjMov4brs4ctB/d8Ev8XhPxHYg=
 github.com/influxdata/influxql v0.0.0-20180823200743-a7267bff5327/go.mod h1:KpVI7okXjK6PRi3Z5B+mtKZli+R1DnZgb3N+tzevNgo=

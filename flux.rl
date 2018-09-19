@@ -84,7 +84,22 @@ primary = literal; # (todo) > complete ... pipexpr | array | literal | ...
 # expdecl = logicalexpr;
 
 # fixme > we are in a rush
-expr = literal;
+
+
+#todo(docmerlin) add ability to parse arguments
+action ex_callexpression { 
+	m.statements = append(m.statements, &ast.CallExpression{
+		Callee:    &ast.Identifier{Name: string(bytes.TrimRight(m.text(), "()"))},
+		Arguments: nil,
+		// BaseNode: base(m.text(), m.curline, m.col()),
+	})
+	m.identifier = nil
+	m.expression = nil
+}
+
+callexpression = identifier . '()' %ex_callexpression; #todo(docmerlin) add ability to parse arguments
+
+expr = literal|callexpression;
 expdecl = expr;
 
 action ex_identifier {
@@ -132,7 +147,7 @@ closingbrace := (vardecl | optdecl | retdecl | blkdecl)* . blkclose @{ fret; };
 # }
 
 # Statement.
-statement = (vardecl | optdecl | retdecl | blkdecl);
+statement = (vardecl | optdecl | retdecl | blkdecl|expr);
 
 action ex_program {
 	fmt.Println("ex_program")
