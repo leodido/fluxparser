@@ -37,6 +37,18 @@ func TestParse(t *testing.T) {
 			name: "nest block statements",
 			raw:  `{{}}`,
 		},
+		{
+			name: "variable declaration",
+			raw:  `docmerlin =`,
+		},
+		{
+			name: "variable declaration",
+			raw:  `leodido = `,
+		},
+		{
+			name: "variable declaration",
+			raw:  `{docmerlin =}`,
+		},
 	}
 
 	mach := NewMachine()

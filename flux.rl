@@ -37,7 +37,7 @@ doublestringchar = '"' . stringliteral* . '"';
 identifier = alpha_ . alnum_*;
 
 # Variable declaration. # (todo) > complete
-vardecl = identifier __ '=' __;
+vardecl = identifier . __ . '=' . __;
 
 # Option statement. # (todo) > complete
 optdecl = 'option' __ vardecl;
@@ -45,14 +45,14 @@ optdecl = 'option' __ vardecl;
 # Return statement. # (todo) > complete
 retdecl = 'return' __;
 
-blkopen = '{' __;
+blkopen = '{' . __;
 
-blkclose = __ '}';
+blkclose = __ . '}';
 
 # Block declaration. # (todo) > complete
 blkdecl = blkopen >mark @{ fcall closingbrace; }; # fixme> in OR with? => [^{}] |
 
-closingbrace := blkdecl* blkclose >mark @{ fret; };
+closingbrace := (vardecl | optdecl | retdecl | blkdecl)* blkclose >mark @{ fret; };
 
 # Statement. # (todo) > complete
 statement = (vardecl | optdecl | retdecl | blkdecl);
