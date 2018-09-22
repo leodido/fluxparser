@@ -1,6 +1,8 @@
 %%{
 machine booleans;
 
+include commonactions "commonactions.rl";
+
 action ex_booleanliteral {
     var v bool
     if string(m.text()) == "true" {
