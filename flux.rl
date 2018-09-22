@@ -2,20 +2,23 @@ package fluxparser
 
 import (
 	"github.com/influxdata/flux/ast"
+	// "strconv"
+	// "bytes"
+	// "github.com/davecgh/go-spew/spew"
+	"fmt"
 )
 
 %%{
 machine flux;
 
+include commonactions "commonactions.rl";
+include integers "integers.rl";
+include durations "durations.rl";
+include strings "strings.rl";
+
 alphtype uint8;
 
-action mark {
-	//fmt.Println("mark", m.pb, m.p, m.stack)
-	m.pb = m.p
-}
-
 newline = '\n' @{
-	//fmt.Println("INSIDEN")
 	m.sol = m.p
     m.curline++;
 };
@@ -29,21 +32,6 @@ alnum_ = alnum | '_';
 
 # Alpha characters or underscore.
 alpha_ = alpha | '_';
-
-action ex_doublestringchar {
-	m.expression = &ast.StringLiteral{
-		Value: string(m.text()),
-	}
-}
-
-fieldstringchar =
-	[^\n\f\r\\"] | '\\' [\\"];
-
-fieldstring =
-	fieldstringchar* >mark %ex_doublestringchar;
-
-doublestringchar =
-	'"' fieldstring '"';
 
 action ex_identifier {
 	m.identifier = &ast.Identifier{
@@ -73,7 +61,7 @@ unaryop = '-' | 'not';
 # # Logical operators.
 logicalop = 'or' | 'OR' | 'and' | 'AND';
 
-literal = doublestringchar; # (todo) > complete ... | booleanliteral | regexpliteral
+literal = stringliteral | durationliteral; # (todo) > complete ... | booleanliteral | regexpliteral
 
 primary = literal; # (todo) > complete ... pipexpr | array | literal | ...
 
@@ -129,22 +117,22 @@ action ex_vardecl{
 }
 
 # Variable declaration. # (todo) > complete
-vardecl = (identifier . __ . '=' . __ . expr) %ex_vardecl;
+vardecl = (identifier . __ . '=' . __ . expr) %eof(ex_vardecl);
 
 # Option statement. # (todo) > complete
-optdecl = 'option' __ vardecl;
+optdecl = 'option' . __ . vardecl;
 
 # Return statement. # (todo) > complete
-retdecl = 'return' __;
+retdecl = 'return' . __;
 
-blkopen = '{' . __;
+blk_ini = '{' . __;
 
-blkclose = __ . '}';
+blk_end = __ . '}';
 
 # Block declaration.
-blkdecl = blkopen @{ fcall closingbrace; }; # fixme> in OR with? => [^{}] |
+blkdecl = blk_ini @{ fcall blkbody; }; # fixme> in OR with? => [^{}] |
 
-closingbrace := (vardecl | optdecl | retdecl | blkdecl |expr)* . blkclose @{ fret; };
+blkbody := (vardecl | optdecl | retdecl | blkdecl | expdecl)* . blk_end @{ fret; };
 
 # action ex_statement {
 # 	fmt.Println("ex_statement")
@@ -208,6 +196,8 @@ type machine struct {
 	statements   []ast.Statement 	 
 	identifier   *ast.Identifier
 	expression   ast.Expression
+	durations 	 []ast.Duration
+	durationrank int
 }
 
 func NewMachine() *machine {
@@ -244,6 +234,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 	m.eof = len(input)
 	m.err = nil
 	m.root = nil
+	m.durationrank = 11
 
     %% write init;
     %% write exec;
