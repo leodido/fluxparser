@@ -6,6 +6,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/influxdata/flux/ast"
 	"github.com/influxdata/flux/ast/asttest"
+	"github.com/influxdata/flux/parser"
 )
 
 func TestParse(t *testing.T) {
@@ -45,6 +46,20 @@ func TestParse(t *testing.T) {
 						Declarations: []*ast.VariableDeclarator{{
 							ID:   &ast.Identifier{Name: "howdy"},
 							Init: &ast.StringLiteral{Value: "literal"},
+						}},
+					},
+				},
+			},
+		},
+		{
+			name: "use variable to declare something, without spaces",
+			raw:  `howdy="1"`,
+			want: &ast.Program{
+				Body: []ast.Statement{
+					&ast.VariableDeclaration{
+						Declarations: []*ast.VariableDeclarator{{
+							ID:   &ast.Identifier{Name: "howdy"},
+							Init: &ast.StringLiteral{Value: "1"},
 						}},
 					},
 				},
@@ -162,30 +177,44 @@ func TestParse(t *testing.T) {
 	}
 }
 
-func BenchmarkParse(b *testing.B) {
-	tests := []struct {
-		name string
-		raw  []byte
-	}{
-		{
-			name: "use variable to declare something",
-			raw:  []byte(`howdy = "literal"`),
-		},
-		{
-			name: "use variable to declare something without spaces",
-			raw:  []byte(`howdy="1"`),
-		},
-		{
-			name: "from function",
-			raw:  []byte(`from()`),
-		},
-	}
+var btests = []struct {
+	name string
+	raw  string
+}{
+	{
+		name: "use variable to declare something",
+		raw:  `howdy = "literal"`,
+	},
+	{
+		name: "use variable to declare something without spaces",
+		raw:  `howdy="1"`,
+	},
+	{
+		name: "from function",
+		raw:  `from()`,
+	},
+	{
+		name: "duration literal, all units",
+		raw:  `dur = 1y3mo2w1d4h1m30s5ms2μs70ns`,
+	},
+}
 
-	for _, tt := range tests {
+func BenchmarkParse(b *testing.B) {
+	for _, tt := range btests {
 		mach := NewMachine()
 		b.Run(tt.name, func(b *testing.B) {
 			for n := 0; n < b.N; n++ {
-				mach.Parse(tt.raw)
+				mach.Parse([]byte(tt.raw))
+			}
+		})
+	}
+}
+
+func BenchmarkPigeonParse(b *testing.B) {
+	for _, tt := range btests {
+		b.Run(tt.name, func(b *testing.B) {
+			for n := 0; n < b.N; n++ {
+				parser.NewAST(tt.raw)
 			}
 		})
 	}
