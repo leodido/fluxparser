@@ -66,7 +66,7 @@ action ex_durationsliteral {
         Values: m.durations,
     }
     // (todo) > reset m.durations
-    fmt.Println(m.durations)
+    // fmt.Println(m.durations)
 }
 
 duration = 

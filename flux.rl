@@ -5,14 +5,16 @@ import (
 	// "strconv"
 	// "bytes"
 	// "github.com/davecgh/go-spew/spew"
-	"fmt"
+	// "fmt"
 )
 
 %%{
 machine flux;
 
 include commonactions "commonactions.rl";
+
 include integers "integers.rl";
+include booleans "booleans.rl";
 include durations "durations.rl";
 include strings "strings.rl";
 
@@ -61,7 +63,7 @@ unaryop = '-' | 'not';
 # # Logical operators.
 logicalop = 'or' | 'OR' | 'and' | 'AND';
 
-literal = stringliteral | durationliteral; # (todo) > complete ... | booleanliteral | regexpliteral
+literal = stringliteral | booleanliteral | durationliteral; # (todo) > complete ... | booleanliteral | regexpliteral
 
 primary = literal; # (todo) > complete ... pipexpr | array | literal | ...
 
