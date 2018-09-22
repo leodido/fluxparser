@@ -59,7 +59,13 @@ action rankns {
 }
 
 action ex_durationsliteral {
+    // reset duration rank
     m.durationrank = 11
+    //
+    m.expression = &ast.DurationLiteral{
+        Values: m.durations,
+    }
+    // (todo) > reset m.durations
     fmt.Println(m.durations)
 }
 
@@ -71,8 +77,8 @@ duration =
         ('y' when { m.durationrank > 10 } %ranky) -> again |
         ('y' when { m.durationrank > 10 } %ranky) -> final |
 
-        ('mo' when { m.durationrank > 9 } @(emme, 2) %rankmo) -> again |
-        ('mo' when { m.durationrank > 9 } %(emme, 2) %rankmo) -> final | 
+        ('mo' when { m.durationrank > 9 } @(mp, 2) %rankmo) -> again |
+        ('mo' when { m.durationrank > 9 } %(mp, 2) %rankmo) -> final | 
 
         ('w' when { m.durationrank > 8 } %rankw) -> again | 
         ('w' when { m.durationrank > 8 } %rankw) -> final |
@@ -83,14 +89,14 @@ duration =
         ('h' when { m.durationrank > 6 } %rankh) -> again |
         ('h' when { m.durationrank > 6 } %rankh) -> final |
 
-        ('m' when { m.durationrank > 5 } @(emme, 1) %rankm) -> again |
-        ('m' when { m.durationrank > 5 } %(emme, 1) %rankm) -> final |
+        ('m' when { m.durationrank > 5 } @(mp, 1) %rankm) -> again |
+        ('m' when { m.durationrank > 5 } %(mp, 1) %rankm) -> final |
 
         ('s' when { m.durationrank > 4 } %ranks) -> again |
         ('s' when { m.durationrank > 4 } %ranks) -> final |
 
-        ('ms' when { m.durationrank > 3 } @(emme, 2) %rankms) -> again |
-        ('ms' when { m.durationrank > 3 } %(emme, 2) %rankms) -> final |
+        ('ms' when { m.durationrank > 3 } @(mp, 2) %rankms) -> again |
+        ('ms' when { m.durationrank > 3 } %(mp, 2) %rankms) -> final |
 
         ('us' when { m.durationrank > 2 } %rankus) -> again |  
         ('us' when { m.durationrank > 2 } %rankus) -> final |
@@ -104,6 +110,6 @@ duration =
         ('1'..'9' . digit*) >mark -> units
     );
 
-durationliteral = duration %ex_durationsliteral;
+durationliteral = duration %eof(ex_durationsliteral);
 
 }%%
