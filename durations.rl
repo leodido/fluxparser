@@ -66,21 +66,23 @@ action ex_durationsliteral {
         Values: m.durations,
     }
     // (todo) > reset m.durations
-    // fmt.Println(m.durations)
+    fmt.Println(m.durations)
 }
+
+non0digit = '1'..'9';
 
 duration = 
     start: (
-        ('1'..'9' . digit*) >mark -> units
+        (non0digit . digit*) >mark -> units
     ),
     units: (
         ('y' when { m.durationrank > 10 } %ranky) -> again |
         ('y' when { m.durationrank > 10 } %ranky) -> final |
 
         ('mo' when { m.durationrank > 9 } @(mp, 2) %rankmo) -> again |
-        ('mo' when { m.durationrank > 9 } %(mp, 2) %rankmo) -> final | 
+        ('mo' when { m.durationrank > 9 } %(mp, 2) %rankmo) -> final |
 
-        ('w' when { m.durationrank > 8 } %rankw) -> again | 
+        ('w' when { m.durationrank > 8 } %rankw) -> again |
         ('w' when { m.durationrank > 8 } %rankw) -> final |
 
         ('d' when { m.durationrank > 7 } %rankd) -> again |
@@ -107,9 +109,29 @@ duration =
         ('ns' when { m.durationrank > 1 } %rankns) -> final
     ),
     again: (
-        ('1'..'9' . digit*) >mark -> units
+        (non0digit . digit*) >mark -> units
     );
 
-durationliteral = duration %eof(ex_durationsliteral);
+# (fixme)
+# action ex_integerliteral {
+#     // (todo) > handle errors
+#     vi, _ := strconv.Atoi(string(m.text()))
+#     m.expression = &ast.IntegerLiteral{
+#         Value: int64(vi),
+#     }
+#     fmt.Println("ex_int", m.expression)
+# }
+# 
+# action ex_floatliteral {
+#     // (todo) > handle errors
+#     vf, _ := strconv.ParseFloat(string(m.text()), 64)
+#     m.expression = &ast.FloatLiteral{
+#         Value: vf,
+#     }
+#     fmt.Println("ex_float", m.expression)
+# }
+# floatliteral = (('0' | non0digit . digit*) . '.' digit+) >mark %eof(ex_floatliteral);
+# integerliteral = ('0' | non0digit . digit*) >mark %eof(ex_integerliteral);
 
+durationliteral = duration %eof(ex_durationsliteral);
 }%%

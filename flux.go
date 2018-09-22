@@ -1,10 +1,11 @@
 package fluxparser
 
 import (
-	"github.com/influxdata/flux/ast" // "strconv"
+	"github.com/influxdata/flux/ast"
+	// "strconv"
 	// "bytes"
 	// "github.com/davecgh/go-spew/spew"
-	// "fmt"
+	"fmt"
 )
 
 
@@ -10143,7 +10144,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 			case 25:
 
@@ -10158,6 +10159,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 				})
 				m.identifier = nil
 				m.expression = nil
+				fmt.Println("ex_vardecl")
 
 			case 101:
 
@@ -10205,7 +10207,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 
 				m.statements = append(m.statements, &ast.VariableDeclaration{
@@ -10219,6 +10221,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 				})
 				m.identifier = nil
 				m.expression = nil
+				fmt.Println("ex_vardecl")
 
 			case 104:
 
@@ -10258,6 +10261,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 				})
 				m.identifier = nil
 				m.expression = nil
+				fmt.Println("ex_vardecl")
 
 
 				//fmt.Println("ex_program")
@@ -10294,6 +10298,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 				})
 				m.identifier = nil
 				m.expression = nil
+				fmt.Println("ex_vardecl")
 
 
 				//fmt.Println("ex_program")
@@ -10321,7 +10326,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 
 				//fmt.Println("ex_program")
@@ -10349,7 +10354,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 
 				//fmt.Println("ex_program")
@@ -10377,7 +10382,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 
 				//fmt.Println("ex_program")
@@ -10405,7 +10410,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 
 				//fmt.Println("ex_program")
@@ -10433,7 +10438,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 
 				//fmt.Println("ex_program")
@@ -10461,7 +10466,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 
 				//fmt.Println("ex_program")
@@ -10489,7 +10494,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 
 				//fmt.Println("ex_program")
@@ -10517,7 +10522,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 
 				//fmt.Println("ex_program")
@@ -10545,7 +10550,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 
 				//fmt.Println("ex_program")
@@ -10573,7 +10578,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 
 				//fmt.Println("ex_program")
@@ -10601,7 +10606,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 
 				//fmt.Println("ex_program")
@@ -10640,6 +10645,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 				})
 				m.identifier = nil
 				m.expression = nil
+				fmt.Println("ex_vardecl")
 
 
 				//fmt.Println("ex_program")
@@ -10667,7 +10673,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 
 				m.statements = append(m.statements, &ast.VariableDeclaration{
@@ -10681,6 +10687,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 				})
 				m.identifier = nil
 				m.expression = nil
+				fmt.Println("ex_vardecl")
 
 
 				//fmt.Println("ex_program")
@@ -10708,7 +10715,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 
 				m.statements = append(m.statements, &ast.VariableDeclaration{
@@ -10722,6 +10729,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 				})
 				m.identifier = nil
 				m.expression = nil
+				fmt.Println("ex_vardecl")
 
 
 				//fmt.Println("ex_program")
@@ -10749,7 +10757,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 
 				m.statements = append(m.statements, &ast.VariableDeclaration{
@@ -10763,6 +10771,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 				})
 				m.identifier = nil
 				m.expression = nil
+				fmt.Println("ex_vardecl")
 
 
 				//fmt.Println("ex_program")
@@ -10790,7 +10799,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 
 				m.statements = append(m.statements, &ast.VariableDeclaration{
@@ -10804,6 +10813,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 				})
 				m.identifier = nil
 				m.expression = nil
+				fmt.Println("ex_vardecl")
 
 
 				//fmt.Println("ex_program")
@@ -10831,7 +10841,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 
 				m.statements = append(m.statements, &ast.VariableDeclaration{
@@ -10845,6 +10855,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 				})
 				m.identifier = nil
 				m.expression = nil
+				fmt.Println("ex_vardecl")
 
 
 				//fmt.Println("ex_program")
@@ -10872,7 +10883,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 
 				m.statements = append(m.statements, &ast.VariableDeclaration{
@@ -10886,6 +10897,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 				})
 				m.identifier = nil
 				m.expression = nil
+				fmt.Println("ex_vardecl")
 
 
 				//fmt.Println("ex_program")
@@ -10913,7 +10925,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 
 				m.statements = append(m.statements, &ast.VariableDeclaration{
@@ -10927,6 +10939,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 				})
 				m.identifier = nil
 				m.expression = nil
+				fmt.Println("ex_vardecl")
 
 
 				//fmt.Println("ex_program")
@@ -10954,7 +10967,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 
 				m.statements = append(m.statements, &ast.VariableDeclaration{
@@ -10968,6 +10981,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 				})
 				m.identifier = nil
 				m.expression = nil
+				fmt.Println("ex_vardecl")
 
 
 				//fmt.Println("ex_program")
@@ -10995,7 +11009,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 
 				m.statements = append(m.statements, &ast.VariableDeclaration{
@@ -11009,6 +11023,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 				})
 				m.identifier = nil
 				m.expression = nil
+				fmt.Println("ex_vardecl")
 
 
 				//fmt.Println("ex_program")
@@ -11036,7 +11051,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 
 				m.statements = append(m.statements, &ast.VariableDeclaration{
@@ -11050,6 +11065,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 				})
 				m.identifier = nil
 				m.expression = nil
+				fmt.Println("ex_vardecl")
 
 
 				//fmt.Println("ex_program")
@@ -11077,7 +11093,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 					Values: m.durations,
 				}
 				// (todo) > reset m.durations
-				// fmt.Println(m.durations)
+				fmt.Println(m.durations)
 
 
 				m.statements = append(m.statements, &ast.VariableDeclaration{
@@ -11091,6 +11107,7 @@ func (m *machine) Parse(input []byte) *ast.Program {
 				})
 				m.identifier = nil
 				m.expression = nil
+				fmt.Println("ex_vardecl")
 
 
 				//fmt.Println("ex_program")
