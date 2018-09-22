@@ -51,19 +51,47 @@ var tests = []struct {
 		},
 	},
 	{
-		name: "use variable to declare an integer",
-		raw:  `howdy="1"`,
+		name: "use variable to declare a string omitting whitespaces",
+		raw:  `howdy="literal"`,
 		want: &ast.Program{
 			Body: []ast.Statement{
 				&ast.VariableDeclaration{
 					Declarations: []*ast.VariableDeclarator{{
 						ID:   &ast.Identifier{Name: "howdy"},
-						Init: &ast.StringLiteral{Value: "1"},
+						Init: &ast.StringLiteral{Value: "literal"},
 					}},
 				},
 			},
 		},
 	},
+	// {
+	// 	name: "declare variable as an int",
+	// 	raw:  `howdy = 123`,
+	// 	want: &ast.Program{
+	// 		Body: []ast.Statement{
+	// 			&ast.VariableDeclaration{
+	// 				Declarations: []*ast.VariableDeclarator{{
+	// 					ID:   &ast.Identifier{Name: "howdy"},
+	// 					Init: &ast.IntegerLiteral{Value: 123},
+	// 				}},
+	// 			},
+	// 		},
+	// 	},
+	// },
+	// {
+	// 	name: "declare variable as a float",
+	// 	raw:  `howdy = 1.22108740859`,
+	// 	want: &ast.Program{
+	// 		Body: []ast.Statement{
+	// 			&ast.VariableDeclaration{
+	// 				Declarations: []*ast.VariableDeclarator{{
+	// 					ID:   &ast.Identifier{Name: "howdy"},
+	// 					Init: &ast.FloatLiteral{Value: 1.22108740859},
+	// 				}},
+	// 			},
+	// 		},
+	// 	},
+	// },
 	{
 		name: "use variable to declare a boolean",
 		raw:  `howdy = true`,
