@@ -63,7 +63,9 @@ unaryop = '-' | 'not';
 # # Logical operators.
 logicalop = 'or' | 'OR' | 'and' | 'AND';
 
-literal = stringliteral | booleanliteral | durationliteral; # (todo) > complete ... | booleanliteral | regexpliteral
+pipeliteral = '<-';
+
+literal = stringliteral | booleanliteral | pipeliteral | durationliteral; # (todo) > complete ...
 
 primary = literal; # (todo) > complete ... pipexpr | array | literal | ...
 
